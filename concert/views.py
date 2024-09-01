@@ -30,23 +30,27 @@ def index(request):
 
 # Songs view
 def songs(request):
-    songs = [
-        {"id": 1, "title": "duis faucibus accumsan odio curabitur convallis",
-         "lyrics": "Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis."}
-    ]
-    return render(request, "songs.html", {"songs": songs})
+    songs_url = os.getenv('SONGS_URL', 'http://default_songs_url/song')
+    try:
+        response = req.get(songs_url)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        songs = response.json()
+        return render(request, "songs.html", {"songs": songs.get("songs", [])})
+    except req.RequestException as e:
+        # Handle request exceptions
+        return render(request, "songs.html", {"error": str(e)})
 
 # Photos view
 def photos(request):
-    photos = [{
-        "id": 1,
-        "pic_url": "http://dummyimage.com/136x100.png/5fa2dd/ffffff",
-        "event_country": "United States",
-        "event_state": "District of Columbia",
-        "event_city": "Washington",
-        "event_date": "11/16/2022"
-    }]
-    return render(request, "photos.html", {"photos": photos})
+    photos_url = os.getenv('PHOTO_URL', 'http://default_photos_url/picture')
+    try:
+        response = req.get(photos_url)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        photos = response.json()
+        return render(request, "photos.html", {"photos": photos})
+    except req.RequestException as e:
+        # Handle request exceptions
+        return render(request, "photos.html", {"error": str(e)})
 
 # Login view
 def login_view(request):
